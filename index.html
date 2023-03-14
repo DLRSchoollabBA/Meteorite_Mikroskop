@@ -1,0 +1,500 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/bootstrap.bundle.min.js"></script>
+
+    <link href="css/jquery-ui.css" rel="stylesheet">
+    <link href="css/mikroskopieren.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.8.17/jquery-ui.min.js"></script>
+    <!--<script type="text/javascript" src="js/jquery.ui.touch-punch.min.js"></script>-->
+    <!-- <script src="js/jquery.ui.touch-punch2.min.js"></script> -->
+</head>
+
+<style>
+body {
+    background:transparent;
+    /* overflow: hidden; */
+}
+ img {
+    display: block; /* remove extra space below image */
+}
+#mikroskop {
+    justify-content: center;
+    position:relative;
+    width:70%;
+    margin:auto;
+    background-image:url("img/mikroskop_leer_dl_ff.svg");
+    background-repeat:no-repeat;
+    height:100%;
+
+}
+
+.wideBox h1,
+.wideBox h2
+{
+    margin-bottom:0px;
+}
+.wideBox {
+    margin-left:0px !important;
+    margin-right:0px !important;
+} 
+
+.wideBox3, .wideBox { margin-top: 0px !important; margin-bottom:0px !important; }
+.wideBox2 { margin-top:10px !important; margin-bottom:10px !important; }
+.wrapper, html, body {
+    height: 100%;
+    margin: 0;
+}
+.wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+#row3 {
+    flex:2;
+    display: flex;
+}
+#col1 {
+    flex: 1 1;
+    min-height: 100%;/* chrome needed it a question time , not anymore */
+}
+#col2 {
+    flex: 1 1;
+    min-height: 100%;/* chrome needed it a question time , not anymore */
+}
+#col3 {
+    flex: 1 1;
+    min-height: 100%;/* chrome needed it a question time , not anymore */
+}
+
+.image-wrapper { 
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: auto;
+    background-size: cover;
+    text-align: center;
+
+    margin:auto; 
+    padding:auto; 
+    height:100%;
+}
+
+#logo {
+    max-height:80%;
+    background-repeat:no-repeat;
+}
+
+#logobg {
+    background-image:url("img/logo_bg.svg");
+    background-repeat:no-repeat;
+    justify-content: center;
+    position:relative;
+    width:55%;
+    margin:auto;
+}
+
+#controls {
+    justify-content: center;
+    position:relative;
+    width:70%;
+    margin:auto;
+}
+#grobtrieb,
+#feintrieb {
+    width:100%;
+}
+#objekttisch_img {
+    justify-content: center;
+    position:relative;
+    width:35%;
+    margin:auto;
+    z-index:9;
+    right:38%;
+    top:61%; 
+}
+#revolver_img {
+    justify-content: center;
+    position:relative;
+    width:70%;
+    margin:auto;
+    z-index:1;
+}
+#grobtrieb_img {
+    width:18%;
+    height:18%;
+    position:relative;
+    top:32%;
+    right:20%;
+}
+#feintrieb_img {
+ 
+    top:17%;   /*
+    width:18%;
+    height:12%;
+    */
+    position:relative;
+    /*
+    top:32%;
+    right:17%;
+    */
+    z-index:9;
+}
+
+#mikroskop_img {
+    background-image:url("img/mikroskop.svg");
+    background-repeat:no-repeat;
+    width:100%;
+    height:100%;
+}
+.whiteOut {
+    color:#fff;
+}
+
+@media screen and (orientation:portrait) {
+
+  /**/ 
+
+ }
+
+ .button {
+    text-transform: none;
+    font-family: Arial;
+    background-color: #3b98cb !important;
+    color: #ffffff;
+    border-radius: 5px;
+    height: auto;
+    border: 1px solid #6cb9dc;
+    padding:  6px;
+ }
+
+ #weiterBtn {
+    display:none;
+ }
+
+</style>
+
+
+
+<script>
+
+$( document ).ready(function() {
+    $("#logo").css("-webkit-filter", "blur(60px)"); 
+});
+
+function updateGrobtrieb() {
+    
+    var grobtriebVal = document.getElementById('grobtrieb').value; 
+    grobtrieb(grobtriebVal);
+
+}
+function grobtrieb(grobtriebVal) {
+
+    grobtriebValPX = 65-grobtriebVal;
+ 
+    //console.log("grobtriebVal: "+grobtriebVal);
+
+    if(grobtriebVal > 60) {
+        grobtriebValPX = grobtriebVal-60;
+    //  console.log("NEW GROBTRIEB VAL: "+grobtriebValPX);
+    }
+
+
+    if(grobtriebValPX > 95 && grobtriebValPX <= 99) { grobtriebValPX = 95; }
+    $("#logo").css("-webkit-filter", "blur("+grobtriebValPX+"px)"); 
+
+    var checkBlur = $("#logo").css("-webkit-filter");
+    // console.log(checkBlur);
+    if(checkBlur == "blur(0px)") {
+        $("#weiterBtn").css("display", "block");
+    } else {
+        $("#weiterBtn").css("display", "none");
+    }
+
+    $("#grobtriebBlurVal").html(grobtriebValPX);
+
+
+
+    // Drehregler Rotation 
+
+
+    // Unterbinden, wenn Tisch bereits ganz oben
+    var actualTopPercentage = $("#objekttisch_img").position().top / $("#objekttisch_img").parent().height() * 100;
+
+    if(actualTopPercentage <= 44.55357142857143) {
+        console.log("Stop Rotation!");
+    } else {
+
+        var grobtriebRegler = (grobtriebVal*7.2);
+        $("#grobtrieb_img").css("transform", "rotate("+grobtriebRegler+"deg)");
+
+        var feintriebRegler = (grobtriebVal*14.4);
+        //var feintriebRegler = (grobtriebVal*72);
+        $("#feintrieb_img").css("transform", "rotate("+feintriebRegler+"deg)");
+
+
+    }
+
+   
+
+
+    var objektTraegerPercent = (grobtriebVal/7.14);
+    //var actualTopPercentage = $("#objekttisch_img").position().top / $("#objekttisch_img").parent().height() * 100;
+    var actualTopPercentage = 58;
+
+
+    var newTopPercantage = actualTopPercentage-objektTraegerPercent;
+   // $("#objekttisch_img").css("top", "newTopPercantage"%");
+   
+    $("#objekttisch_img").css({ top: newTopPercantage+"%" });
+
+    // console.log("NEW: "+newTopPercantage+" Aktuell: "+actualTopPercentage+" Prozent Objekttäger zu fahren:"+objektTraegerPercent);
+   // $("#grobtrieb_img").css("transform", "rotate("+grobtriebRegler+"deg)");
+    
+    // Get Objekttisch actual Position
+    var actualPosition = $("#objekttisch_img").position().top /  $("#objekttisch_img").parent().height() * 100;
+
+
+    // console.log("GROB Actual PosISTION: "+actualPosition);
+   
+    // RANGE 
+    
+    var newFeintriebVal = grobtriebVal;
+    $("#feintrieb").val(newFeintriebVal);
+
+}
+
+
+function updateFeintrieb() {
+    
+    var feintriebVal = document.getElementById('feintrieb').value; 
+    feintrieb(feintriebVal);
+
+
+    console.log("Update Feintrieb! "+feintriebVal);
+
+}
+
+function feintrieb(feintriebVal) {
+
+    // console.log("ActualFeintriebVal: "+feintriebVal);
+    // BLUR des OBJEKTS
+    // SPIELVERSION 110 sonst 100 eigentlich korrekt aber Spieleffekt verpufft mit Nachjustieren.
+    var feintriebValPX =  feintriebVal-60;
+  
+    // console.log("NEW FeintriebVal: "+feintriebVal);
+    
+    $("#logo").css("-webkit-filter", "blur("+feintriebValPX+"px)"); 
+
+
+    var checkBlur = $("#logo").css("-webkit-filter");
+    // console.log(checkBlur);
+    if(checkBlur == "blur(0px)" || checkBlur == "blur(1px)" || checkBlur == "blur(2px)") {
+        $("#weiterBtn").css("display", "block");
+    } else {
+        $("#weiterBtn").css("display", "none");
+    }
+
+
+
+    if(feintriebVal < 60) {
+        feintriebValPX = feintriebVal-60;
+        feintriebValPX = feintriebValPX*-1;
+  
+        $("#logo").css("-webkit-filter", "blur("+feintriebValPX+"px)"); 
+    }
+    // DREHREGLER 
+
+    // Muss sich 4 x drehen, während sich der Groebtrieb 2 x dreht.
+    // 4 * 360° = 1440 (/ 100 für die Range) = 14,4 #
+
+
+    // Unterbinden, wenn Tisch bereits ganz oben
+    var actualTopPercentage = $("#objekttisch_img").position().top / $("#objekttisch_img").parent().height() * 100;
+
+    if(actualTopPercentage <= 44.55357142857143) {
+        console.log("Stop Rotation!");
+    } else {
+
+        
+        var feintriebRegler = (feintriebVal*14.4);
+        $("#feintrieb_img").css("transform", "rotate("+feintriebRegler+"deg)");
+
+        // Muss sich 2 x drehen wenn der Feintrieb sich 4 x dreht 
+        var grobtriebRegler = (feintriebVal*7.2);
+        $("#grobtrieb_img").css("transform", "rotate("+grobtriebRegler+"deg)");
+
+    }
+
+
+    
+
+    // OBJEKTTISCH
+
+    // Objekttisch ist zwischen unten und oben top:42% und top: 56%
+    // Ergibt eine Range von 14% die auf 100 geteilt werden müssen.
+
+    var objektTraegerPercent = (feintriebVal/14.28);
+    var actualTopPercentage = 58;
+
+    console.log("actualTopPercentage "+actualTopPercentage);
+
+    // Get Objekttisch actual Position
+    var actualPosition = $("#objekttisch_img").position().top /  $("#objekttisch_img").parent().height() * 100;
+    console.log("actualPosition "+actualPosition);
+    
+
+    /*
+    if(actualPosition <= 44) {
+        document.getElementById("feintrieb").disabled = true;
+    } else {
+        document.getElementById("feintrieb").disabled = false;
+    }
+    */
+    objektTraegerPercent = objektTraegerPercent*2;
+    var newTopPercantage = actualTopPercentage-objektTraegerPercent;
+
+console.log("newTopPercantage:::"+newTopPercantage);
+
+    if(newTopPercantage <= 44 || newTopPercantage >= 58) {} else {
+        $("#objekttisch_img").css({ top: newTopPercantage+"%" });
+    }
+    
+
+
+    // RANGE 
+
+    var newGrobtriebVal = feintriebVal;
+    $("#grobtrieb").val(newGrobtriebVal);
+
+}
+
+function weiterMikroskopieren1() {
+    window.localStorage.setItem('mikroskopieren_schaerfe_beendet', '1');
+}
+
+</script>
+
+
+<body style="max-height:100vh !important;">
+
+<div id="grobtriebBlurVal" style="display:none;"></div>
+
+<style>
+
+/*
+@import url('http://getbootstrap.com/2.3.2/assets/css/bootstrap.css');
+@import url('http://getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css'); */
+
+.container {
+    background: #f3f3f3;
+}
+#counter {
+    position: relative;
+    display: inline;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#feintrieb_img {
+    position:absolute;
+    left:35%;
+    top:62%;
+    max-width: 70%;
+    z-index:10;
+    width:100%;
+}
+
+#mikroskop {
+    width:70%;
+}
+
+.svg {
+  
+}
+    </style>
+
+<div class="wrapper">
+    <div id="row1" class="wideBox">
+        <h1>Einstellen des Fokus</h1>
+    </div>
+    <div  class="wideBox wideBox2" id="row2">
+        <h2>
+            Der Grob- und Feintrieb sind Drehregler an den Seiten des Mikrokops. Mit ihnen wird der Objekttisch nach oben und unten verschoben, sodass die Probe in den Brennpunkt des Objektivs gebracht werden kann. Erst dann wird das im Mikroskop sichtbare Bild scharf. Der Grobtrieb verändert dabei den Abstand schneller als der Feintrieb. 
+            Probiere es unten aus und finde die Einstellung, in der Du das DLR-Logo scharf sehen kannst!
+        </h2>
+    </div>
+    <div class="wideBox wideBox3" id="row3">
+
+        <div id="col1" class="col-sm-4">
+
+            <div class="image-wrapper" style="margin:auto; padding:auto; height:100%;">
+                
+                <div id="counter">
+                    <img id="mikroskop" src="img/mikroskop_leer_dl.png" width="100px" height="100px"/>
+                    <img id="feintrieb_img" src="img/feintrieb_grow.svg" />
+                    <img class="img-fluid" id="grobtrieb_img" style="position: absolute; left: 35%; top: 59%; width: 70%;" src="img/grobtrieb.svg">
+                    <img class="img-fluid" id="revolver_img"  style="position: absolute; top:0%; width:100%; max-width:100%; max-height:100%;" src="img/mikroskop_revolver_groß.svg">
+                    <img class="img-fluid" id="objekttisch_img" style="position: absolute; max-width:100%; max-height:100%;" src="img/objekttisch.svg">   
+                </div>
+
+            </div>  
+
+        </div>
+
+
+    
+        <div id="col2" class="col-sm-4 justify-content align-items">
+            <div class="image-wrapper" style="margin:auto; padding:auto; height:100%;">
+                <div id="logobg">
+                    <img class="img-fluid" id="logo" src="img/logo_links.png">
+                </div>
+            </div>
+        </div>
+        <div id="col3" class="col-sm-4 justify-content align-items">
+            <div class="image-wrapper">
+                <div id="controls">
+                        <div class="whiteOut">Grobtrieb</div>                 
+                        <div>
+                            <input type='range' min='0' max='99' step='3' id='grobtrieb' value='0' oninput="updateGrobtrieb(this);" />
+                        </div>
+                        <br />
+                        <div class="whiteOut">Feintrieb</div>
+                        
+                        <div>
+                            <input type='range' min='0' max='200' step='1' id='feintrieb' value='0' oninput="updateFeintrieb();" />
+                        </div>
+                </div>
+            </div>
+        </div>
+        <div id="weiterBtn2" style="position:absolute; right:10px;">
+            <input class="button" id="weiterBtn" type="submit" name="" value="Weiter" onClick="weiterMikroskopieren1()">
+        </div>
+    </div>
+</div>
+
+
+
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
