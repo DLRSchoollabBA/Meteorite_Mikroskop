@@ -331,8 +331,8 @@ function feintrieb(feintriebVal) {
         $("#feintrieb_img").css("transform", "rotate("+feintriebRegler+"deg)");
 
         // Muss sich 2 x drehen wenn der Feintrieb sich 4 x dreht 
-        var grobtriebRegler = (feintriebVal*7.2);
-        $("#grobtrieb_img").css("transform", "rotate("+grobtriebRegler+"deg)");
+        // var grobtriebRegler = (feintriebVal*7.2);
+        //$("#grobtrieb_img").css("transform", "rotate("+grobtriebRegler+"deg)");
 
     }
 
@@ -374,8 +374,8 @@ console.log("newTopPercantage:::"+newTopPercantage);
 
     // RANGE 
 
-    var newGrobtriebVal = feintriebVal;
-    $("#grobtrieb").val(newGrobtriebVal);
+    // var newGrobtriebVal = feintriebVal;
+    // $("#grobtrieb").val(newGrobtriebVal);
 
 }
 
@@ -466,13 +466,13 @@ function weiterMikroskopieren1() {
                 <div id="controls">
                         <div class="whiteOut">Grobtrieb</div>                 
                         <div>
-                            <input type='range' min='0' max='99' step='3' id='grobtrieb' value='0' oninput="updateGrobtrieb(this);" />
+                            <input type='range' min='0' max='100' step='10' id='grobtrieb' value='10' oninput="updateGrobtrieb(this);" />
                         </div>
                         <br />
                         <div class="whiteOut">Feintrieb</div>
                         
                         <div>
-                            <input type='range' min='0' max='200' step='1' id='feintrieb' value='0' oninput="updateFeintrieb();" />
+                            <input type='range' min='0' max='10' step='1' id='feintrieb' value='5' oninput="updateFeintrieb();" />
                         </div>
                 </div>
             </div>
